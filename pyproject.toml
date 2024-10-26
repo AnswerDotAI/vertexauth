@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "vertexauth"
+version = "0.1.0"
+description = ""
+authors = ["Alexis Gallagher <alexis@alexisgallagher.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+anthropic = {extras = ["vertex"], version = "^0.37.1"}
+claudette = {version = "^0.1.0", optional = true, extras = ["claudette"]}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
