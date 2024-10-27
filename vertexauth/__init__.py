@@ -1,7 +1,7 @@
-from .core import load_vertex_vals, save_vertex_vals
+from .core import load_vertex_vals, create_superkey_env_value, create_superkey_file
 from importlib.util import find_spec as _find_spec
 
-__all__ = ["load_vertex_vals", "save_vertex_vals"]
+__all__ = ["load_vertex_vals", "create_superkey_env_value", "create_superkey_file"]
 
 if _find_spec("claudette") is not None:
     from .claudette import get_claudette_client
