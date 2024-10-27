@@ -2,41 +2,44 @@
 
 This is a helper library for accessing Google Vertex AI models
 
-To use it, get a GCloud _Service Account Key File_ (SAKF), then save a default "superkey" file like so:
+To use it, get a GCloud _Service Account Key File_ (SAKF), then save a default "superkey" file into your `.config` dir, like so:
 
 ``` python
-import vertexauth
-path=vertexauth.create_superkey_file(SAKF_path='/path/to/gcloud/service_auth_key_file.json',
+from vertexauth import create_superkey_file
+path=create_superkey_file(SAKF_path='/path/to/gcloud/service_auth_key_file.json',
                                      region='us-east5',
                                      save_as_default=True)
 ```
 
-The superkey file is just the SAKF file, with region information added.. This saves it in your `.config` dir. 
+The superkey file is just the SAKF file with region information added.
 
-Then later, you can create a claudette client or AnthropicVertex client object like so:
+Then later, you can create a [claudette](https://claudette.answer.ai/) client or [AnthropicVertex](https://docs.anthropic.com/en/api/claude-on-vertex-ai) client object like so:
 
 ``` python
-import vertexauth, vertexauth.anthropic, vertexauth.claudette, claudette
+from vertexauth import get_anthropic_client, get_claudette_client, load_vertex_vals
+from claudette import Chat
 
 # AnthropicVertex
-anthropic_client = vertexauth.anthropic.get_anthropic_client()
+anthropic_client = get_anthropic_client()
+
 # claudette.Client
-claudette_client = vertexauth.claudette.get_claudette_client()
-cl_chat = claudette.Chat(cli=claudette_client)
+claudette_client = get_claudette_client()
+cl_chat = Chat(cli=claudette_client)
 cl_chat("Hi, there!")
-# just access the vals
-val_dict = vertexauth.load_vertex_vals()
+
+# just read the vals
+val_dict = load_vertex_vals()
 ```
 
-The main functions also let you pass a specific superkey path.
+These functions also let you pass a path to a specific superkey, instad of loading the default one.
 
-Alternatively, they can read an env var, `VERTEXAUTH_SUPERKEY`, which contains a superkey as a string. This lets you share it and use it like a normal API key. However, it's a bit long -- around 3,000 characters long, since it's simply the gzipped, base64-encoded contents of the file. Use `create_superkey_env_value` to create one.
+Alternatively, they can read an env var, `VERTEXAUTH_SUPERKEY`, which contains a superkey as a string. This lets you share it and use it like a normal API key. However, it's a bit long -- around 2,500 characters, since it's simply the gzipped, base64-encoded contents of the file. Use `create_superkey_env_value` to create one.
 
 ## Huh, what's a Service Account Key File?
 
-Of course, it would be easier of course if Google just gave us a single API key value.
+Yes it would be easier of course if Google just gave us a single API key value. But they don't.
 
-But afaict the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a json file with embedded credentials. And even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a VertexAI model. So it's a bit of a hassle., and that's what this helps with.
+afaict the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a JSON file with embedded credentials. But even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a VertexAI model. So it's a bit of a hassle., and that's what this library helps with. That's all.
 
 ## But how do I get this blessed Service Account Key File from Google
 
@@ -54,7 +57,7 @@ It's not pretty. Here's approximately what you need to do:
     - Scope to a particular `region` (e.g., "us-east5") and and
       `base_model` (e.g., "anthropic-claude-3-5-sonnet-v2")
     - Use "Edit Quota" to ensure that you have a non-zero quote for it
-- Also, within that panel, select "Credentials"
+- Also, within that same panel, select "Credentials"
     - Click "+ Create Credentials"
     - Select "Service Account" 
     - Enter a name like "vertexaiserviceaccount" etc for the account, 

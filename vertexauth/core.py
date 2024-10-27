@@ -20,7 +20,7 @@ def load_vertex_vals(superkey:str|None=None,superkey_path:str|None=None) -> dict
     elif superkey_path is not None:       path = Path(superkey_path)
     elif SUPERKEY_ENV_VAR in os.environ:  path = _superkey_from_env_value(os.getenv(SUPERKEY_ENV_VAR))
     elif SUPERKEY_DEFAULT_PATH.is_file(): path = SUPERKEY_DEFAULT_PATH
-    else: raise Exception(f"No env var {SUPERKEY_ENV_VAR} found")
+    else: raise Exception(f"No superkey file found in {SUPERKEY_DEFAULT_PATH} and no value found in the environment variable {SUPERKEY_ENV_VAR}. Please either install a superkey file in that path, generating a new one if necessary with create_superkey_file. Or, please add that environment variable, generating it if needed with create_superkey_env_value.")
     try: d = json.loads(path.read_text())
     except (json.JSONDecodeError, FileNotFoundError) as e:
         raise Exception(f"Failed to read JSON from {path}: {e}")
