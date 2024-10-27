@@ -1,14 +1,8 @@
 # VertexAuth
 
-This is a package to streamline the process of accessing AI models served by Google's Vertex AI.
+This is a package to streamline the process of using Vertex AI models served by Google's Vertex AI.
 
-You probably wish you could just lay hands on a single API key value, like with other APIs. Me too!
-
-Alas, afaict, the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File", a json file. And even once you have this, you need to supply it along with other coordinated pieces of information to use the API.
-
-Once you have that file, this library will let you save it with the other information at a single path, and provide convenience functions to create a valid `AnthropicVertex` object for a claudette `Client` object, for accessing Anthropic models easily.
-
-First, create a vertexauth "superkey"
+Once you have Service Account Key File, create a vertexauth "superkey".
 
 ``` python
 import vertexauth
@@ -26,7 +20,7 @@ cl_chat = claudette.Chat(cli=claudette_client)
 cl_chat("Hi, there!")
 ```
 
-Or you can use it to initialize an AnthropicVertex client object, or to load the values directly:
+Alternatively, you can use it to initialize an AnthropicVertex client object, or to load the values directly:
 
 ``` python
 import vertexauth, vertexauth.claudette, vertexauth.anthropic
@@ -34,10 +28,17 @@ vals = vertexauth.load_vertex_vals(superkey_path) # vals has values needed for a
 anthropic_client = vertexauth.anthropic.get_anthropic_client(superkey_path)
 ```
 
+## Huh, what's a Service Account Key File?
+
+Look. You probably wish you could just lay hands on a single API key value, like with other APIs. Me too!
+
+Alas, afaict, the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a json file with embedded credentials. And even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a model, so it's still a bit of a hassle.
+
+This library is only able to help with that last part, by saving all the information into one file, a "superkey" file. With that file, it helps you create a valid `AnthropicVertex` object for a claudette `Client` object, for accessing Anthropic models easily.
 
 ## But how do I get this blessed Service Account Key File from Google
 
-It's rough. Here's approximately what you need to do in the Google Cloud console:
+My friends, it's ugly. Here's approximately what you need to do in the Google Cloud console:
 
 - Select a project
 - Go to APIs & Services
