@@ -2,7 +2,7 @@
 
 This is a helper library for accessing Google Vertex AI models
 
-To use it, get a Gcloud _Service Account Key File_ (SAKF), then create a vertexauth "superkey" file like so:
+To use it, get a GCloud _Service Account Key File_ (SAKF), then save a default "superkey" file like so:
 
 ``` python
 import vertexauth
@@ -11,7 +11,7 @@ path=vertexauth.create_superkey_file(SAKF_path='/path/to/gcloud/service_auth_key
                                      save_as_default=True)
 ```
 
-This puts the SAKF and region info into a single file in your `.config` dir.
+The superkey file is just the SAKF file, with region information added.. This saves it in your `.config` dir. 
 
 Then later, you can create a claudette client or AnthropicVertex client object like so:
 
@@ -28,15 +28,15 @@ cl_chat("Hi, there!")
 val_dict = vertexauth.load_vertex_vals()
 ```
 
-The main functions also let you pass a superkey path.
+The main functions also let you pass a specific superkey path.
 
-Also, they can read an env var, `VERTEXAUTH_SUPERKEY`, which contains a superkey embedded in one string. This lets you share it and use it like a normal API key, except that it will be about 3,000 characters long. Use `create_superkey_env_value` to create such embedded value.
+Alternatively, they can read an env var, `VERTEXAUTH_SUPERKEY`, which contains a superkey as a string. This lets you share it and use it like a normal API key. However, it's a bit long -- around 3,000 characters long, since it's simply the gzipped, base64-encoded contents of the file. Use `create_superkey_env_value` to create one.
 
 ## Huh, what's a Service Account Key File?
 
-You probably wish you could just lay hands on a single API key value, like with other APIs. Me too.
+Of course, it would be easier of course if Google just gave us a single API key value.
 
-But afaict the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a json file with embedded credentials. And even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a model. So it's a bit of a hassle., and that's what this helps with.
+But afaict the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a json file with embedded credentials. And even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a VertexAI model. So it's a bit of a hassle., and that's what this helps with.
 
 ## But how do I get this blessed Service Account Key File from Google
 
