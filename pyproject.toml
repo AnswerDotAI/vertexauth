@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "vertexauth"
 version = "0.1.0"
-description = ""
+description = "Helper for authenticating with VertexAI"
 authors = ["Alexis Gallagher <alexis@alexisgallagher.com>"]
 readme = "README.md"
 
