@@ -6,10 +6,11 @@ authors = ["Alexis Gallagher <alexis@alexisgallagher.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-anthropic = {version = "^0.37.1", extras = ["vertex"]}
-claudette = {version = "^0.1.0"}
+python = ">=3.10"
+anthropic = {version = ">=0.37.1", extras = ["vertex"]}
+claudette = {version = ">=0.1.0"}
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
