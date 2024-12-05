@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "vertexauth"
+  site-url: "https://AnswerDotAI.github.io/vertexauth"
+  description: "A helper library for accessing Google Vertex AI models"
+  repo-branch: main
+  repo-url: "https://github.com/AnswerDotAI/vertexauth"
