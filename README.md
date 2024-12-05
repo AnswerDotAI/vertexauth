@@ -64,4 +64,19 @@ It's not pretty. Here's approximately what you need to do:
     - For permissions, give it the "Vertex AI Service Agent" role.
     - Go to keys, select "Add key" and select "JSON"
 
+Here are examples of the exact names and filter paramters of two quotas which might be relevant to you:
+
+quota1:
+- name: "Online prediction tokens per minute per base model per minute per region per base_model"
+- region: us-east5
+- base_model: anthropic-claude-3-5-sonnet-v2
+- value: 450
+
+quota2:
+- name: "Online prediction requests per base model per minute per region per base_model"
+- region: us-east5
+- base_model: anthropic-claude-3-5-sonnet-v2
+- value: 1630000
+
+
 
