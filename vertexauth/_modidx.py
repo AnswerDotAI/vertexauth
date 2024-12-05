@@ -5,4 +5,5 @@ d = { 'settings': { 'branch': 'main',
                 'doc_host': 'https://AnswerDotAI.github.io',
                 'git_url': 'https://github.com/AnswerDotAI/vertexauth',
                 'lib_path': 'vertexauth'},
-  'syms': {'vertexauth.core': {'vertexauth.core.foo': ('core.html#foo', 'vertexauth/core.py')}}}
+  'syms': { 'vertexauth.core': { 'vertexauth.core.get_anthropic_client': ('core.html#get_anthropic_client', 'vertexauth/core.py'),
+                                 'vertexauth.core.get_claudette_client': ('core.html#get_claudette_client', 'vertexauth/core.py')}}}
