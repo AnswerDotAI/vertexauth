@@ -14,11 +14,10 @@ from anthropic import AnthropicVertex, AsyncAnthropicVertex
 from claudette import Client, AsyncClient
 
 
-# %% ../nbs/00_core.ipynb 31
+# %% ../nbs/00_core.ipynb 28
 SUPERKEY_DEFAULT_PATH = Path.home() / ".config" / "vertexauth" / "default" / "superkey.json"
 
-
-# %% ../nbs/00_core.ipynb 37
+# %% ../nbs/00_core.ipynb 34
 def get_anthropic_client(asink=False,anthropic_kwargs=None):
     d = json.loads(SUPERKEY_DEFAULT_PATH.read_text())
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(SUPERKEY_DEFAULT_PATH)
