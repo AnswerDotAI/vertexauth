@@ -1,0 +1,82 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "vertexauth",
+    "section": "",
+    "text": "Install latest from the GitHub repository:\n$ pip install git+https://github.com/AnswerDotAI/vertexauth.git\nor from conda\n$ conda install -c AnswerDotAI vertexauth\nor from pypi\n$ pip install vertexauth\n\n\n\nDocumentation can be found hosted on this GitHub repository’s pages. Additionally you can find package manager specific guidelines on conda and pypi respectively.",
+    "crumbs": [
+      "vertexauth"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "vertexauth",
+    "section": "",
+    "text": "Install latest from the GitHub repository:\n$ pip install git+https://github.com/AnswerDotAI/vertexauth.git\nor from conda\n$ conda install -c AnswerDotAI vertexauth\nor from pypi\n$ pip install vertexauth\n\n\n\nDocumentation can be found hosted on this GitHub repository’s pages. Additionally you can find package manager specific guidelines on conda and pypi respectively.",
+    "crumbs": [
+      "vertexauth"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "vertexauth",
+    "section": "How to use",
+    "text": "How to use\nTo use this library, you need install a “superkey” credential file in your ~/.config/vertexauth/default/superkey.json.\nThen, you can do the following to get access to a claudette.Client, which is authenticated to use Anthropic’s Sonnet 3.5 v2 model, hosted on Vertex AI and paid for by Google Cloud budget:\n\nfrom vertexauth.core import get_claudette_client\ncl = get_claudette_client()\n\n\ncl(\"Hi, Claude!\")\n\nHi! I’m happy to help. What would you like to discuss?\n\n\nid: msg_vrtx_016Tu5UWnM6q6uzASTpr7BTV\ncontent: [{'text': \"Hi! I'm happy to help. What would you like to discuss?\", 'type': 'text'}]\nmodel: claude-3-5-sonnet-v2-20241022\nrole: assistant\nstop_reason: end_turn\nstop_sequence: None\ntype: message\nusage: {'input_tokens': 11, 'output_tokens': 18}\n\n\n\n\nWhat is a superkey? It is merely a Google Cloud Service Account Key File, encoded in JSON, with a region key/value pair added.\nPlease consult the notebook 00_core.ipynb for a working example of creating a service account, creating a service account key, downloading the key file, and saving a superkey file into the default location.",
+    "crumbs": [
+      "vertexauth"
+    ]
+  },
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "If you already have the vertexauth “superkey.json”, then you may skip this section and proceed to Authenticating to Claudette.\nOtherwise, this is example code to create a Google Cloud (GC) Service Account, and from there create a GC Service Account Key file, and from there create a vertexauth superkey.json\n\n\n\n# !pip install -q google-cloud-service-usage google-cloud-iam google-cloud-resource-manager\n\n\nWe’ll need to use the google.cloud.iam_admin_v1 client library\nThe documentation notes that we’ll need:\n\nproject_id: The Google Cloud project ID\naccount: The service account ID or email\n\n\n\nimport google.auth\nfrom google.cloud import iam_admin_v1\nfrom google.cloud.iam_admin_v1 import types\nfrom google.cloud import resourcemanager_v3\nfrom google.iam.v1 import policy_pb2\n\nWe can work with Google’s IAM API by using a client, assuming you have first run gcloud auth application-default login.\n\nproject_id = 'jph001'\n\n\ncli = iam_admin_v1.IAMClient()\ncredentials, project_id = google.auth.default()\nproject = f\"projects/{project_id}\"\nproject\n\n'projects/jph001'\n\n\nWe will need a “service account” with the appropriate permissions. You can check your account list like so:\n\naccounts = cli.list_service_accounts(name = project)\n# accounts\n\n…and here is how to create an account:\n\naccount_id=\"aiservice2\"\ndisplay_name=\"Vertex AI Service Account 2\"\ndescription=\"Access Vertex AI\"\n\n\nsvc = dict(display_name=display_name, description=description)\naccount = cli.create_service_account(name=project, account_id=account_id, service_account=svc)\n# account\n\n\npolcli = resourcemanager_v3.ProjectsClient()\npolicy = polcli.get_iam_policy(resource=project)\n\n\nmember = f\"serviceAccount:{account.email}\"\nroles = [ \"roles/aiplatform.user\", \"roles/servicemanagement.quotaViewer\", \"roles/servicemanagement.quotaAdmin\" ]\n\n\nfor role in roles:\n    binding = policy_pb2.Binding()\n    binding.role = role\n    binding.members.append(member)\n    policy.bindings.append(binding)\n    \npolres = polcli.set_iam_policy(request={\"resource\": project, \"policy\": policy})\n\n(If you later wanted to delete a service account, you could the following:)\n\n# cli.delete_service_account(name=f\"projects/{project_id}/serviceAccounts/aiservice@jph001.iam.gserviceaccount.com\")\n\n\n\n\n\nkey = cli.create_service_account_key(name = f\"projects/{project_id}/serviceAccounts/{account.email}\")\n\n\nkeyd = json.loads(key.private_key_data.decode())\nkeyb = json.dumps(keyd).encode()\n\n\npath = Path('service-account-key.json')\npath.write_bytes(keyb)\n\n2329\n\n\n\n\n\nA vertexauth “superkey” is merely a SAKF file with a “region” key/value pair added so that it can be the only resource needed in order to use this library.\nIf a colleague already gave you a superkey, save it in ~/.config/vertexauth/default/superkey.json, and skip to the next section Authenticating to Claudette. But if you only have a SAKF JSON file, as created above or downloaded from the Google Cloud web UI, then you create and save a superkey as follows:\n\ndef save_superkey_file(SAKF_path, region) -&gt; Path:\n    d = json.loads(Path(SAKF_path).read_text())\n    d[\"region\"] = region\n    SUPERKEY_DEFAULT_PATH.parent.mkdir(parents=True,exist_ok=True)\n    SUPERKEY_DEFAULT_PATH.write_text(json.dumps(d))\n    SUPERKEY_DEFAULT_PATH.chmod(0o600)\n    return SUPERKEY_DEFAULT_PATH\n\nSave a superkey based on the path of the service account key we just created above and saved in path.\n\nsave_superkey_file(path,'us-east5')\n\nPath('/Users/alexis/.config/vertexauth/default/superkey.json')",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#optional-setting-up-to-authenticate-with-vertex-ai",
+    "href": "core.html#optional-setting-up-to-authenticate-with-vertex-ai",
+    "title": "core",
+    "section": "",
+    "text": "If you already have the vertexauth “superkey.json”, then you may skip this section and proceed to Authenticating to Claudette.\nOtherwise, this is example code to create a Google Cloud (GC) Service Account, and from there create a GC Service Account Key file, and from there create a vertexauth superkey.json\n\n\n\n# !pip install -q google-cloud-service-usage google-cloud-iam google-cloud-resource-manager\n\n\nWe’ll need to use the google.cloud.iam_admin_v1 client library\nThe documentation notes that we’ll need:\n\nproject_id: The Google Cloud project ID\naccount: The service account ID or email\n\n\n\nimport google.auth\nfrom google.cloud import iam_admin_v1\nfrom google.cloud.iam_admin_v1 import types\nfrom google.cloud import resourcemanager_v3\nfrom google.iam.v1 import policy_pb2\n\nWe can work with Google’s IAM API by using a client, assuming you have first run gcloud auth application-default login.\n\nproject_id = 'jph001'\n\n\ncli = iam_admin_v1.IAMClient()\ncredentials, project_id = google.auth.default()\nproject = f\"projects/{project_id}\"\nproject\n\n'projects/jph001'\n\n\nWe will need a “service account” with the appropriate permissions. You can check your account list like so:\n\naccounts = cli.list_service_accounts(name = project)\n# accounts\n\n…and here is how to create an account:\n\naccount_id=\"aiservice2\"\ndisplay_name=\"Vertex AI Service Account 2\"\ndescription=\"Access Vertex AI\"\n\n\nsvc = dict(display_name=display_name, description=description)\naccount = cli.create_service_account(name=project, account_id=account_id, service_account=svc)\n# account\n\n\npolcli = resourcemanager_v3.ProjectsClient()\npolicy = polcli.get_iam_policy(resource=project)\n\n\nmember = f\"serviceAccount:{account.email}\"\nroles = [ \"roles/aiplatform.user\", \"roles/servicemanagement.quotaViewer\", \"roles/servicemanagement.quotaAdmin\" ]\n\n\nfor role in roles:\n    binding = policy_pb2.Binding()\n    binding.role = role\n    binding.members.append(member)\n    policy.bindings.append(binding)\n    \npolres = polcli.set_iam_policy(request={\"resource\": project, \"policy\": policy})\n\n(If you later wanted to delete a service account, you could the following:)\n\n# cli.delete_service_account(name=f\"projects/{project_id}/serviceAccounts/aiservice@jph001.iam.gserviceaccount.com\")\n\n\n\n\n\nkey = cli.create_service_account_key(name = f\"projects/{project_id}/serviceAccounts/{account.email}\")\n\n\nkeyd = json.loads(key.private_key_data.decode())\nkeyb = json.dumps(keyd).encode()\n\n\npath = Path('service-account-key.json')\npath.write_bytes(keyb)\n\n2329\n\n\n\n\n\nA vertexauth “superkey” is merely a SAKF file with a “region” key/value pair added so that it can be the only resource needed in order to use this library.\nIf a colleague already gave you a superkey, save it in ~/.config/vertexauth/default/superkey.json, and skip to the next section Authenticating to Claudette. But if you only have a SAKF JSON file, as created above or downloaded from the Google Cloud web UI, then you create and save a superkey as follows:\n\ndef save_superkey_file(SAKF_path, region) -&gt; Path:\n    d = json.loads(Path(SAKF_path).read_text())\n    d[\"region\"] = region\n    SUPERKEY_DEFAULT_PATH.parent.mkdir(parents=True,exist_ok=True)\n    SUPERKEY_DEFAULT_PATH.write_text(json.dumps(d))\n    SUPERKEY_DEFAULT_PATH.chmod(0o600)\n    return SUPERKEY_DEFAULT_PATH\n\nSave a superkey based on the path of the service account key we just created above and saved in path.\n\nsave_superkey_file(path,'us-east5')\n\nPath('/Users/alexis/.config/vertexauth/default/superkey.json')",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#authenticating-to-claudette",
+    "href": "core.html#authenticating-to-claudette",
+    "title": "core",
+    "section": "Authenticating to Claudette",
+    "text": "Authenticating to Claudette\nOnce you have a superkey file (i.e., a JSON SAKF plus a region key/value pair), then you can use these functions to create a claudette client or an Anthropic client.\n\nsource\n\nget_claudette_client\n\n get_claudette_client (vertex_model='claude-3-5-sonnet-v2@20241022',\n                       asink=False, anthropic_kwargs=None)\n\n\nsource\n\n\nget_anthropic_client\n\n get_anthropic_client (asink=False, anthropic_kwargs=None)",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#using-claudette",
+    "href": "core.html#using-claudette",
+    "title": "core",
+    "section": "Using claudette",
+    "text": "Using claudette\n\ncl = get_claudette_client()\n\n\ncl('hi')\n\nHello! How can I help you today?\n\n\nid: msg_vrtx_013ZqSR5aJtQ1W6XkgsQ1FHP\ncontent: [{'text': 'Hello! How can I help you today?', 'type': 'text'}]\nmodel: claude-3-5-sonnet-v2-20241022\nrole: assistant\nstop_reason: end_turn\nstop_sequence: None\ntype: message\nusage: {'input_tokens': 8, 'output_tokens': 12}",
+    "crumbs": [
+      "core"
+    ]
+  },
+  {
+    "objectID": "core.html#todo-quota-management",
+    "href": "core.html#todo-quota-management",
+    "title": "core",
+    "section": "Todo: quota management",
+    "text": "Todo: quota management\n\nquota_docs = read_gist('https://gist.github.com/jph00/943c51623abfe0deae65cfad2d821169')\nsvcuse_docs = read_gist('https://gist.github.com/jph00/042580724e98ae0cce2db50de92abd1b')\n\n\nfrom google.cloud import service_usage_v1\n\nYes I see some options we could use – do you want me to outline them now?\n\nscli = service_usage_v1.ServiceUsageClient()\nservices = scli.list_services(request={\"parent\": project, \"filter\":\"state:ENABLED\"})",
+    "crumbs": [
+      "core"
+    ]
+  }
+]
