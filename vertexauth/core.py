@@ -27,7 +27,7 @@ def get_anthropic_client(asink=False,anthropic_kwargs=None):
     return AV(region=d['region'],project_id=d['project_id'], **anthropic_kwargs)    
 
 def get_claudette_client(vertex_model='claude-3-5-sonnet-v2@20241022', 
-                         asink=False, anthropic_kwargs=None):
+                         asink=False, anthropic_kwargs=None, cache=False):
     vertex_cli = get_anthropic_client(asink, anthropic_kwargs)
-    if asink: return AsyncClient(vertex_model, vertex_cli)
-    else: return Client(vertex_model, vertex_cli)
+    if asink: return AsyncClient(vertex_model, vertex_cli, cache=cache)
+    else: return Client(vertex_model, vertex_cli, cache=cache)
