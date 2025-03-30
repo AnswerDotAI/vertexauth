@@ -41,7 +41,7 @@ Yes it would be easier of course if Google just gave us a single API key value. 
 
 afaict the closest you can get to this with Google Vertex AI is to generate a "Service Account Key File" (SAKF), a JSON file with embedded credentials. But even once you have this, you need to supply it along with other coordinated pieces of information (like project ID and region) in order to make an API request against a VertexAI model. So it's a bit of a hassle., and that's what this library helps with. That's all.
 
-## But how do I get this blessed Service Account Key File from Google
+## But how do I get this blessed Service Account Key File from Google?
 
 It's not pretty. Here's approximately what you need to do:
 
